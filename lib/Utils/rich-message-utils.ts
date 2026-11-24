@@ -6,9 +6,6 @@ export interface MarkdownPayloadOptions {
   footer?: string
 }
 
-/**
- * Membuat payload rich message GenAI Markdown
- */
 export function generateMarkdownContent(opts: MarkdownPayloadOptions) {
   const { markdown, title, footer } = opts
   if (!markdown || typeof markdown !== 'string') {
@@ -22,9 +19,6 @@ export function generateMarkdownContent(opts: MarkdownPayloadOptions) {
   }
 }
 
-/**
- * Extract interactive element dari message (contoh helper)
- */
 export function extractIE(message: any) {
   if (!message) return null
   return (
