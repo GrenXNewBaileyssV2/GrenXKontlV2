@@ -1,8 +1,7 @@
-
-<div align='center'>GrenXbaileys</div>
+<div align='center'>GrenXKontlV2</div>
 
 <p align="center">
-  <img src="https://ganga--link--ghhzdp9sv8hk.code.run/i/6r8d73n1.jpg" width="180" alt="GrenXbaileys"/>
+  <img src="https://ganga--link--ghhzdp9sv8hk.code.run/i/6r8d73n1.jpg" width="180" alt="GrenXKontlV2"/>
 </p>
 
 ---
@@ -12,7 +11,7 @@
 ![source](https://img.shields.io/badge/source-GitHub-black.svg)
 ![node](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)
 
-Pustaka WebSockets untuk berinteraksi dengan WhatsApp Web, dikelola dengan merek GrenXbaileys.
+Pustaka WebSockets untuk berinteraksi dengan WhatsApp Web, dikelola dengan merek GrenXKontlV2.
 Proyek ini merupakan fork yang dibangun di atas Baileys oleh WhiskeySockets.
 
 </div>
@@ -44,20 +43,20 @@ Membutuhkan Node.js 20+ (paket ini hanya ESM; lihat [Impor](#impor)).
 Dari npm registry (setelah dipublikasikan):
 
 ```bash
-npm install @grenxbaileys/baileys
+npm install @grenxkontlv2/baileys
 ```
 
 Langsung dari GitHub:
 
 ```bash
-npm install github:GrenXbaileys/Baileys
+npm install github:GrenXKontlV2/Baileys
 ```
 
 Atau tambahkan ke package.json secara manual:
 
 ```json
 "dependencies": {
-  "@grenxbaileys/baileys": "latest"
+  "@grenxkontlv2/baileys": "latest"
 }
 ```
 
@@ -67,7 +66,7 @@ mengarah ke fork ini:
 
 ```json
 "dependencies": {
-  "@whiskeysockets/baileys": "npm:@grenxbaileys/baileys"
+  "@whiskeysockets/baileys": "npm:@grenxkontlv2/baileys"
 }
 ```
 
@@ -77,7 +76,7 @@ mengarahkannya ke fork ini di balik layar.
 Kamu juga bisa pin ke branch atau commit tertentu:
 
 ```bash
-npm install github:GrenXbaileys/Baileys#main
+npm install github:GrenXKontlV2/Baileys#main
 ```
 
 ---
@@ -87,7 +86,7 @@ Impor
 ESM (berfungsi di semua versi Node.js yang didukung):
 
 ```javascript
-import makeWASocket, { Browsers, DisconnectReason } from '@grenxbaileys/baileys';
+import makeWASocket, { Browsers, DisconnectReason } from '@grenxkontlv2/baileys';
 ```
 
 CommonJS: paket ini hanya ESM, jadi require() hanya berfungsi di Node.js 22.12+ atau 20.19+
@@ -96,8 +95,7 @@ CommonJS: paket ini hanya ESM, jadi require() hanya berfungsi di Node.js 22.12+ 
 ```javascript
 const {
   default: makeWASocket,
-  // ekspor lainnya
-} = require('@grenxbaileys/baileys');
+} = require('@grenxkontlv2/baileys');
 ```
 
 ---
@@ -110,14 +108,12 @@ Dengan QR Code
 const {
   default: makeWASocket,
   Browsers
-} = require('@grenxbaileys/baileys');
+} = require('@grenxkontlv2/baileys');
 
 const client = makeWASocket({
-  browser: Browsers.grenxbaileys('Chrome')
+  browser: Browsers.grenxkontlv2('Chrome')
 });
 
-// `printQRInTerminal` sudah deprecated: string QR sekarang datang lewat connection.update.
-// Render dengan library QR milikmu (misalnya qrcode-terminal) jika ingin tampil di terminal.
 client.ev.on('connection.update', ({ connection, qr }) => {
   if (qr) console.log('Scan string QR ini:', qr);
   if (connection === 'open') console.log('Terhubung');
@@ -131,22 +127,20 @@ const {
   default: makeWASocket,
   fetchLatestWAWebVersion,
   Browsers
-} = require('@grenxbaileys/baileys');
+} = require('@grenxkontlv2/baileys');
 
 async function start() {
-  // fetchLatestWAWebVersion() menghasilkan { version, isLatest, error? }
   const { version } = await fetchLatestWAWebVersion();
 
   const client = makeWASocket({
-    browser: Browsers.grenxbaileys('Chrome'),
+    browser: Browsers.grenxkontlv2('Chrome'),
     printQRInTerminal: false,
     version,
-    aiLabel: false // set true untuk menampilkan label AI pada pesan yang dikirim bot
-    // opsi lainnya
+    aiLabel: false
   });
 
   const number = "628XXXXXXXXXX";
-  const code = await client.requestPairingCode(number.trim()); // atau (number, "YYYYYYYY") untuk pairing code kustom
+  const code = await client.requestPairingCode(number.trim());
 
   console.log("Pairing code kamu: " + code);
 }
@@ -166,10 +160,10 @@ Cara Kerja
 
 · Deteksi dilakukan di handler CB:stream:error dan CB:failure.
 · Keyword yang dianggap banned: banned, ban, restricted, blocked, account_locked,
-  sender_banned, spam.
+sender_banned, spam.
 · Status code 401 (loggedOut) dan 403 juga dianggap banned.
 · Saat terdeteksi, socket memancarkan event connection.update dengan payload senderBanned,
-  lalu memanggil end() dengan status loggedOut agar koneksi langsung diputus.
+lalu memanggil end() dengan status loggedOut agar koneksi langsung diputus.
 
 Menangkap Peringatan
 
@@ -179,13 +173,11 @@ client.ev.on('connection.update', (update) => {
     console.error('⚠️ SENDER DIBAN:', update.senderBanned.reason);
     console.error('Detail:', update.senderBanned.detail);
     console.error('Pesan:', update.senderBanned.message);
-    // Lakukan tindakan: lepas sender, ganti nomor, matikan bot, kirim notifikasi ke admin, dll.
   }
 
   if (update.connection === 'close') {
     const statusCode = update.lastDisconnect?.error?.output?.statusCode;
     if (statusCode === DisconnectReason.loggedOut) {
-      // Jangan reconnect. Sender sudah dilepas / sesi tidak valid.
       console.log('Koneksi ditutup (loggedOut). Sender dilepas.');
     }
   }
@@ -218,16 +210,15 @@ Keep-Alive Bawaan (Lebih Toleran)
 Logika keep-alive di lib/Socket/socket.js sudah diperbaiki agar tidak mudah memutus koneksi:
 
 · Timeout limit diubah dari keepAliveIntervalMs + 5000 menjadi
-  (keepAliveIntervalMs * 2) + 10000.
+(keepAliveIntervalMs * 2) + 10000.
 · Jika pengiriman ping gagal, koneksi tidak langsung diputus; hanya dicatat sebagai warning.
-  Koneksi baru diputus jika waktu timeoutLimit benar-benar terlampaui.
+Koneksi baru diputus jika waktu timeoutLimit benar-benar terlampaui.
 
 Atur interval di makeWASocket:
 
 ```javascript
 const client = makeWASocket({
-  keepAliveIntervalMs: 60000, // 60 detik (default 30 detik)
-  // opsi lainnya
+  keepAliveIntervalMs: 60000,
 });
 ```
 
@@ -244,7 +235,7 @@ Menjaga koneksi tetap hidup dengan exponential backoff dan heartbeat.
 import { keepAlive } from 'baileys-keep-alive';
 
 const ka = keepAlive(sock, {
-  reconnectFactory: async () => makeWASocket({ /* auth state Anda */ }),
+  reconnectFactory: async () => makeWASocket({}),
   heartbeat: { intervalMs: 30000 }
 });
 ```
@@ -257,7 +248,6 @@ Melindungi sesi dari reconnect loop dan korupsi kredensial.
 import { reconnectThrottle } from 'baileys-antiban';
 
 const throttle = reconnectThrottle({ cooldownMs: 5000, maxConsecutive: 5 });
-// Gunakan throttle.attemptReconnect() di handler connection.update
 ```
 
 Hal Krusial yang Sering Terlewat
@@ -276,15 +266,13 @@ Menyimpan Data
 const {
   default: makeWASocket,
   makeInMemoryStore
-} = require('@grenxbaileys/baileys');
+} = require('@grenxkontlv2/baileys');
 const pino = require('pino');
 
 const store = makeInMemoryStore({
   logger: pino().child({ level: 'silent', stream: 'store' })
 });
-const client = makeWASocket({
-  // opsi
-});
+const client = makeWASocket({});
 store.bind(client.ev);
 
 client.ev.on('contacts.upsert', () => {
@@ -303,30 +291,27 @@ pesan juga disinkronkan ke perangkat lain milikmu sendiri (ponsel lain/sesi What
 login ke akun yang sama). Ini tidak memengaruhi pengiriman ke penerima.
 
 · noSelfSync: true — pesan dikirim ke penerima seperti biasa, tetapi tidak disinkronkan
-  ke perangkat lain milikmu. Berguna saat kamu tidak ingin pesan muncul di sesi lain yang tertaut
-  (misalnya pengiriman senyap/otomatis dari akun bot).
+ke perangkat lain milikmu. Berguna saat kamu tidak ingin pesan muncul di sesi lain yang tertaut
+(misalnya pengiriman senyap/otomatis dari akun bot).
 · noSelfSync: false (default) — perilaku normal. Pesan dikirim ke penerima dan juga
-  disinkronkan ke perangkat lain milikmu, sehingga muncul di semua tempat kamu login, seperti
-  mengirim dari aplikasi WhatsApp resmi.
+disinkronkan ke perangkat lain milikmu, sehingga muncul di semua tempat kamu login, seperti
+mengirim dari aplikasi WhatsApp resmi.
 
 ```javascript
-// Dikirim ke penerima, tetapi TIDAK disinkronkan ke perangkat lain milikmu
 await client.relayMessage(m.chat, {
-  conversation: "Hello from GrenXbaileys"
+  conversation: "Hello from GrenXKontlV2"
 }, {
   noSelfSync: true
 });
 
-// Dikirim ke penerima DAN disinkronkan ke perangkat lain milikmu (perilaku default)
 await client.relayMessage(m.chat, {
-  conversation: "Hello from GrenXbaileys"
+  conversation: "Hello from GrenXKontlV2"
 }, {
   noSelfSync: false
 });
 
-// Juga berfungsi melalui sendMessage
 await client.sendMessage(m.chat, {
-  text: "Hello from GrenXbaileys"
+  text: "Hello from GrenXKontlV2"
 }, {
   noSelfSync: true
 });
@@ -336,7 +321,7 @@ Mengirim orderMessage
 
 ```javascript
 const fs = require('fs');
-const thumbnail = fs.readFileSync('./grenxbaileysthumb.jpg');
+const thumbnail = fs.readFileSync('./grenxkontlv2thumb.jpg');
 
 await client.sendMessage(m.chat, {
   thumbnail,
@@ -372,7 +357,7 @@ await client.relayMessage(m.chat, {
   productMessage: {
     title: "Produk.pdf",
     description: "Deskripsi produk",
-    thumbnail: { url: "./grenxbaileysthumb.jpg" },
+    thumbnail: { url: "./grenxkontlv2thumb.jpg" },
     productId: "EXAMPLE_TOKEN",
     retailerId: "EXAMPLE_RETAILER_ID",
     url: "https://example.com",
@@ -394,9 +379,9 @@ Mengirim interactiveMessage
 
 ```javascript
 await client.sendMessage(m.chat, {
-  image: { url: "./grenxbaileysimg.jpg" },
+  image: { url: "./grenxkontlv2img.jpg" },
   text: "body",
-  title: "title", // wajib saat mengirim media
+  title: "title",
   footer: "footer",
   interactiveButtons: [
     {
@@ -407,9 +392,7 @@ await client.sendMessage(m.chat, {
     }
   ],
   messageParams: JSON.stringify({
-    bottom_sheet: {
-      /** parameter lainnya **/
-    }
+    bottom_sheet: {}
   })
 });
 ```
@@ -460,7 +443,7 @@ await client.sendText(m.chat, "Halo!", {
 Mengirim Gambar
 
 ```javascript
-await client.sendImage(m.chat, { url: "./grenxbaileysimg.jpg" }, "Caption", {
+await client.sendImage(m.chat, { url: "./grenxkontlv2img.jpg" }, "Caption", {
   contextInfo: {
     mentionedJid: [m.chat]
   }
@@ -498,7 +481,7 @@ await client.sendVideo(m.chat, { url: "./video.mp4" }, "Caption", {
 Mengirim Audio
 
 ```javascript
-await client.sendAudio(m.chat, { url: "./grenxbaileysaudio.mp3" }, {
+await client.sendAudio(m.chat, { url: "./grenxkontlv2audio.mp3" }, {
   contextInfo: {
     mentionedJid: [m.chat]
   }
@@ -585,44 +568,44 @@ await client.statusMention(m.chat, {
 
 Fitur Gabungan (1.1.0)
 
-GrenXbaileys 1.1.0 menggabungkan lapisan tambahan dari fork wbails di atas inti GrenXbaileys:
+GrenXKontlV2 1.1.0 menggabungkan lapisan tambahan dari fork wbails di atas inti GrenXKontlV2:
 
 · Lapisan privasi, interop, GraphQL/Wamo, dan message-builder sock.* (lihat
-  lib/Socket/privacy.js, interop.js, graphql.js, message-builder.js).
+lib/Socket/privacy.js, interop.js, graphql.js, message-builder.js).
 · Protokol USync tambahan: business, picture, text status, sidelist, feature (lib/WAUSync/).
 · Pesan sticker pack ({ stickerPacks: {...} }) dan helper metadata stiker
-  (lib/Utils/sticker.js, membutuhkan ffmpeg di PATH untuk konversi stiker).
+(lib/Utils/sticker.js, membutuhkan ffmpeg di PATH untuk konversi stiker).
 · useSqliteAuthState (membutuhkan Node 22.5+ karena memakai node:sqlite; dimuat secara lazy,
-  jadi Node 20 tidak terpengaruh kecuali kamu memanggilnya).
+jadi Node 20 tidak terpengaruh kecuali kamu memanggilnya).
 · Helper persistensi makeInMemoryStore: writeToFile, readFromFile, writeToFileInterval.
 · Fallback cstoken 1:1: menyimpan salt NCT dari sinkronisasi app-state dan melampirkan cstoken
-  pada pengiriman privat yang tidak memiliki tctoken. Nonaktifkan per pesan dengan
-  { cstoken: false }.
+pada pengiriman privat yang tidak memiliki tctoken. Nonaktifkan per pesan dengan
+{ cstoken: false }.
 
 Implementasi newsletter adalah milik WaBail (lib/Socket/newsletter.js) dan dipakai tanpa perubahan.
 
 Fitur Baru di Versi Ini
 
 · Anti-Ban Sender: deteksi otomatis banned/restricted/blocked, lepas sender, dan peringatan
-  user lewat event connection.update. Lihat Anti-Ban Sender.
+user lewat event connection.update. Lihat Anti-Ban Sender.
 · Keep-Alive Lebih Toleran: timeout limit diperpanjang dan kegagalan ping tidak langsung
-  memutus koneksi. Lihat Keep-Alive & Reconnect.
+memutus koneksi. Lihat Keep-Alive & Reconnect.
 
 ---
 
 Catatan Chat Pribadi vs Grup
 
 · Balas ke msg.key.remoteJid apa adanya. Di chat pribadi bisa berupa @lid; bentuk nomor
-  telepon ada di msg.key.remoteJidAlt.
+telepon ada di msg.key.remoteJidAlt.
 · Di grup, pengirim adalah msg.key.participant (alternatifnya di msg.key.participantAlt).
 · Jika pengiriman ke pengguna tidak dapat menemukan perangkat penerima, relayMessage sekarang
-  melempar 421 alih-alih diam-diam melaporkan sukses.
+melempar 421 alih-alih diam-diam melaporkan sukses.
 
 ---
 
 Kredit
 
-GrenXbaileys adalah fork dari Baileys, yang awalnya dibuat oleh
+GrenXKontlV2 adalah fork dari Baileys, yang awalnya dibuat oleh
 Adhiraj Singh dan dikelola oleh komunitas WhiskeySockets.
 Semua kredit untuk implementasi protokol dasar diberikan kepada penulis dan kontributor asli.
 Lihat LICENSE untuk teks lisensi lengkap dan pemberitahuan hak cipta.
@@ -639,5 +622,3 @@ Disclaimer
 
 Ini bukan produk resmi WhatsApp. Penggunaan library ini untuk mengirim pesan massal atau tidak diminta
 dapat melanggar Ketentuan Layanan WhatsApp dan dapat menyebabkan nomor kamu diblokir. Gunakan dengan bijak.
-
-```
