@@ -2,7 +2,7 @@
   "name": "@poucode/baileys",
   "type": "module",
   "version": "2.0.1",
-  "description": "WaBail — PouCode fork of Baileys: WhatsApp Web WebSocket library with merged extra socket layers (privacy, interop, GraphQL, message builder), sticker packs, SQLite auth state, and native rich message support (Markdown, table, code, LaTeX, unified response, GenAI HTML)",
+  "description": "WaBail — PouCode fork of Baileys: WhatsApp Web WebSocket library with merged extra socket layers (privacy, interop, GraphQL, message builder), sticker packs, SQLite auth state, native rich message support, anti-ban sender, and anti-crash protection",
   "keywords": [
     "poucode",
     "baileys",
@@ -15,7 +15,9 @@
     "whatsapp-bot",
     "rich-message",
     "markdown",
-    "genai"
+    "genai",
+    "anti-ban",
+    "anti-crash"
   ],
   "homepage": "https://github.com/NazCodexID/NxBaileys",
   "repository": {
@@ -37,6 +39,16 @@
       "types": "./lib/Utils/rich-message-utils.d.ts",
       "import": "./lib/Utils/rich-message-utils.js",
       "default": "./lib/Utils/rich-message-utils.js"
+    },
+    "./anti-ban": {
+      "types": "./lib/Utils/anti-ban-sender.d.ts",
+      "import": "./lib/Utils/anti-ban-sender.js",
+      "default": "./lib/Utils/anti-ban-sender.js"
+    },
+    "./anti-crash": {
+      "types": "./lib/Utils/anti-crash.d.ts",
+      "import": "./lib/Utils/anti-crash.js",
+      "default": "./lib/Utils/anti-crash.js"
     },
     "./WAProto": {
       "types": "./WAProto/index.d.ts",
@@ -64,13 +76,15 @@
     "prepare": "",
     "preinstall": "node ./engine-requirements.js",
     "release": "release-it",
-    "test": "node --test test/smoke.test.mjs test/transports.test.mjs test/features.test.mjs test/proto.test.mjs test/rich.test.mjs",
+    "test": "node --test test/smoke.test.mjs test/transports.test.mjs test/features.test.mjs test/proto.test.mjs test/rich.test.mjs test/anti-ban.test.mjs test/anti-crash.test.mjs",
     "test:smoke": "node --test test/smoke.test.mjs",
     "test:transports": "node --test test/transports.test.mjs",
     "test:features": "node --test test/features.test.mjs",
     "test:proto": "node --test test/proto.test.mjs",
     "test:rich": "node --test test/rich.test.mjs",
-    "test:all": "node --test test/smoke.test.mjs test/transports.test.mjs test/features.test.mjs test/proto.test.mjs test/rich.test.mjs"
+    "test:antiban": "node --test test/anti-ban.test.mjs",
+    "test:anticrash": "node --test test/anti-crash.test.mjs",
+    "test:all": "node --test test/smoke.test.mjs test/transports.test.mjs test/features.test.mjs test/proto.test.mjs test/rich.test.mjs test/anti-ban.test.mjs test/anti-crash.test.mjs"
   },
   "dependencies": {
     "@cacheable/node-cache": "^1.4.0",
