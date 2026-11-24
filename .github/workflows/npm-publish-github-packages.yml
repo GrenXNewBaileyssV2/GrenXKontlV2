@@ -19,30 +19,39 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org/
           cache: npm
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      - name: Build Package
+        run: npm run build:tsc
+
       - name: Verify package
         run: npm pack --dry-run
 
       - name: Check version not published
+        id: check_version
         run: |
           PKG_NAME=$(node -p "require('./package.json').name")
           PKG_VERSION=$(node -p "require('./package.json').version")
           if npm view "$PKG_NAME@$PKG_VERSION" version >/dev/null 2>&1; then
-            echo "Version $PKG_VERSION already published. Skipping."
-            exit 1
+            echo "Version $PKG_VERSION already published. Skipping publish."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Publish package
+        if: steps.check_version.outputs.skip != 'true'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
