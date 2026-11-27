@@ -2,7 +2,7 @@
   "name": "@poucode/baileys",
   "type": "module",
   "version": "2.0.1",
-  "description": "WaBail — PouCode fork of Baileys: WhatsApp Web WebSocket library with merged extra socket layers (privacy, interop, GraphQL, message builder), sticker packs, SQLite auth state, native rich message support, anti-ban sender, and anti-crash protection",
+  "description": "WaBail \u2014 PouCode fork of Baileys: WhatsApp Web WebSocket library with merged extra socket layers (privacy, interop, GraphQL, message builder), sticker packs, SQLite auth state, native rich message support, anti-ban sender, and anti-crash protection",
   "keywords": [
     "poucode",
     "baileys",
@@ -55,7 +55,22 @@
       "import": "./WAProto/index.js",
       "default": "./WAProto/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./interactive": {
+      "types": "./lib/Utils/interactive-message.d.ts",
+      "import": "./lib/Utils/interactive-message.js",
+      "default": "./lib/Utils/interactive-message.js"
+    },
+    "./auto-reply": {
+      "types": "./lib/Utils/auto-reply.d.ts",
+      "import": "./lib/Utils/auto-reply.js",
+      "default": "./lib/Utils/auto-reply.js"
+    },
+    "./interactive-response": {
+      "types": "./lib/Utils/interactive-response.d.ts",
+      "import": "./lib/Utils/interactive-response.js",
+      "default": "./lib/Utils/interactive-response.js"
+    }
   },
   "files": [
     "lib/**/*",
@@ -64,9 +79,9 @@
   ],
   "scripts": {
     "clean": "node -e \"import('node:fs').then(fs=>fs.rmSync('lib',{recursive:true,force:true}))\"",
-    "build:all": "npm run build:tsc && npm run build:docs",
+    "build:all": "npm run check:syntax && npm run doctor && npm test",
     "build:docs": "typedoc",
-    "build:tsc": "tsc -p tsconfig.json && tsc-esm-fix --target=lib",
+    "build:tsc": "npm run check:syntax && npm run doctor",
     "changelog:last": "conventional-changelog -p angular -r 2",
     "changelog:preview": "conventional-changelog -p angular -u",
     "gen:protobuf": "sh WAProto/GenerateStatics.sh",
@@ -76,7 +91,7 @@
     "prepare": "",
     "preinstall": "node ./engine-requirements.js",
     "release": "release-it",
-    "test": "node --test test/smoke.test.mjs test/transports.test.mjs test/features.test.mjs test/proto.test.mjs test/rich.test.mjs test/anti-ban.test.mjs test/anti-crash.test.mjs",
+    "test": "node --test test/smoke.test.mjs test/transports.test.mjs test/features.test.mjs test/proto.test.mjs test/rich.test.mjs test/interactive-message.test.mjs test/interactive-response.test.mjs test/anti-ban.test.mjs test/anti-crash.test.mjs test/auto-reply.test.mjs",
     "test:smoke": "node --test test/smoke.test.mjs",
     "test:transports": "node --test test/transports.test.mjs",
     "test:features": "node --test test/features.test.mjs",
@@ -84,7 +99,13 @@
     "test:rich": "node --test test/rich.test.mjs",
     "test:antiban": "node --test test/anti-ban.test.mjs",
     "test:anticrash": "node --test test/anti-crash.test.mjs",
-    "test:all": "node --test test/smoke.test.mjs test/transports.test.mjs test/features.test.mjs test/proto.test.mjs test/rich.test.mjs test/anti-ban.test.mjs test/anti-crash.test.mjs"
+    "test:all": "node --test test/smoke.test.mjs test/transports.test.mjs test/features.test.mjs test/proto.test.mjs test/rich.test.mjs test/interactive-message.test.mjs test/interactive-response.test.mjs test/anti-ban.test.mjs test/anti-crash.test.mjs test/auto-reply.test.mjs",
+    "test:interactive": "node --test test/interactive-message.test.mjs",
+    "doctor": "node scripts/doctor.js",
+    "check:syntax": "node scripts/check-syntax.js",
+    "test:interactive-response": "node --test test/interactive-response.test.mjs",
+    "test:unit": "node --test test/anti-ban.test.mjs test/anti-crash.test.mjs test/auto-reply.test.mjs test/features.test.mjs test/interactive-message.test.mjs test/interactive-response.test.mjs test/rich.test.mjs",
+    "test:integration": "node --test test/smoke.test.mjs test/transports.test.mjs test/proto.test.mjs"
   },
   "dependencies": {
     "@cacheable/node-cache": "^1.4.0",
@@ -141,10 +162,18 @@
     "sharp": "*"
   },
   "peerDependenciesMeta": {
-    "audio-decode": { "optional": true },
-    "jimp": { "optional": true },
-    "link-preview-js": { "optional": true },
-    "sharp": { "optional": true }
+    "audio-decode": {
+      "optional": true
+    },
+    "jimp": {
+      "optional": true
+    },
+    "link-preview-js": {
+      "optional": true
+    },
+    "sharp": {
+      "optional": true
+    }
   },
   "resolutions": {
     "ajv@npm:^6.12.4": "^6.14.0",
@@ -177,7 +206,7 @@
   },
   "packageManager": "yarn@4.9.2",
   "engines": {
-    "node": ">=23.0.0 <25.0.0"
+    "node": ">=22.0.0 <25.0.0"
   },
   "bugs": {
     "url": "https://github.com/GrenXNewBaileyssV2/GrenXKontlV2/issues"
