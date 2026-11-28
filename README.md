@@ -622,3 +622,128 @@ Disclaimer
 
 Ini bukan produk resmi WhatsApp. Penggunaan library ini untuk mengirim pesan massal atau tidak diminta
 dapat melanggar Ketentuan Layanan WhatsApp dan dapat menyebabkan nomor kamu diblokir. Gunakan dengan bijak.
+
+
+## Auto Reply Terhubung ke Socket
+
+Modul auto-reply tersedia melalui export utama dan dapat langsung dipasang ke event
+`messages.upsert` pada socket Baileys:
+
+```javascript
+import makeWASocket, { attachSocketAutoReply } from '@poucode/baileys';
+
+const sock = makeWASocket({ auth: state, logger });
+const autoReply = attachSocketAutoReply(sock, {
+  globalCooldown: 1500,
+  simulateTyping: true,
+  typingDuration: 500
+});
+
+autoReply.handler.addRule({
+  keywords: ['halo', 'hai'],
+  response: { text: 'Halo juga! Ada yang bisa saya bantu?' },
+  quoted: true,
+  cooldown: 3000
+});
+
+// Saat aplikasi dimatikan:
+autoReply.detach();
+```
+
+`attachSocketAutoReply` memproses pesan masuk non-self (`fromMe` diabaikan), meneruskan
+balasan melalui `sock.sendMessage`, dan memakai `sock.sendPresenceUpdate` bila tersedia.
+Gunakan `detach()` saat handler tidak lagi diperlukan. Handler tidak menyimpan aturan
+secara persisten; daftarkan kembali aturan saat aplikasi dijalankan.
+
+
+## Rich Interactive Messages (GrenX)
+
+GrenXKontlV2 menyediakan helper pembuat native-flow WhatsApp dan method pengiriman langsung pada socket. Native-flow dikirim melalui jalur `relayMessage` milik socket, bukan hanya mengembalikan object payload.
+
+```js
+import makeWASocket from '@poucode/baileys'
+
+const sock = makeWASocket(config)
+
+// Native quick replies (maksimal 3 tombol)
+await sock.sendQuickReplyMessage('6281234567890@s.whatsapp.net', 'Pilih menu:', [
+  { id: 'menu_profile', displayText: 'Profil' },
+  { id: 'menu_help', displayText: 'Bantuan' }
+], { footer: 'GrenX Bot' })
+
+// URL button
+await sock.sendUrlButtonsMessage('6281234567890@s.whatsapp.net', 'Buka situs:', [
+  { displayText: 'Website', url: 'https://example.com' }
+])
+
+// List menu (sections: [{ title, rows: [{ id, title, description }] }])
+await sock.sendListMessage('6281234567890@s.whatsapp.net', {
+  text: 'Menu utama', buttonText: 'Pilih',
+  sections: [{ title: 'Menu', rows: [{ id: 'home', title: 'Beranda' }] }]
+})
+
+// Copy, call, gabungan, dan carousel
+await sock.sendCopyCodeMessage(jid, 'Kode promo:', 'GRENTZY', 'Salin kode')
+await sock.sendCallButtonMessage(jid, 'Hubungi admin:', '+6281234567890', 'Telepon')
+await sock.sendCombinedButtonsMessage(jid, 'Aksi:', [
+  { type: 'reply', displayText: 'Lanjut', id: 'continue' },
+  { type: 'url', displayText: 'Website', url: 'https://example.com' }
+])
+await sock.sendCarouselMessage(jid, { text: 'Produk', cards: [
+  { title: 'Kartu 1', body: 'Deskripsi', image: './cover.jpg', buttons: [{ id: 'detail_1', text: 'Detail' }] }
+] })
+```
+
+Helper payload juga dapat diimpor terpisah melalui `@poucode/baileys/interactive`. Fungsi helper memvalidasi jumlah tombol native-flow (1-3), field wajib, JSON button, dan URL HTTP/HTTPS sebelum payload dikirim.
+
+Socket methods: `sendButtonsMessage`, `sendListMessage`, `sendNativeFlowMessage`, `sendQuickReplyMessage`, `sendUrlButtonsMessage`, `sendCopyCodeMessage`, `sendCallButtonMessage`, `sendCombinedButtonsMessage`, dan `sendCarouselMessage`.
+
+
+## Interactive response handler
+
+Native-flow quick replies, legacy buttons, and list selections can be routed to your bot handler. The helper only parses the selected ID and never executes message-provided code.
+
+```js
+const detachResponses = sock.onInteractiveResponse(async (response, message) => {
+  switch (response.id) {
+    case 'menu_help':
+      await sock.sendMessage(message.key.remoteJid, { text: 'Bantuan GrenX' })
+      break
+    case 'menu_status':
+      await sock.sendMessage(message.key.remoteJid, { text: 'Bot aktif.' })
+      break
+  }
+}, { onError: console.error })
+
+// Saat bot berhenti:
+detachResponses()
+```
+
+## Project checks
+
+```bash
+npm install
+npm run doctor
+npm run check:syntax
+npm test
+```
+
+`doctor` checks the supported Node.js range, declared runtime dependencies, package export targets, and JavaScript syntax. A complete test run requires dependencies from `package.json` to be installed.
+
+
+## Validasi dan pengujian
+
+Gunakan Node.js 22–24. Setelah dependensi terpasang, jalankan:
+
+```bash
+npm install
+npm run doctor
+npm run check:syntax
+npm run test:unit
+npm run test:integration
+npm test
+```
+
+`test:unit` menjalankan pengujian fitur yang tidak memerlukan koneksi WhatsApp dan tidak mengimpor entry point utama. `test:integration` memeriksa entry point package, transport, dan skema protobuf; pengujian ini membutuhkan seluruh dependensi runtime. `npm test` tetap menjalankan suite lengkap.
+
+Jika `npm install` gagal, jangan menghapus dependensi inti untuk memaksa test lulus. Periksa koneksi registry npm, akses Git untuk dependency `libsignal`, lalu ulangi instalasi sebelum menjalankan integration test.
